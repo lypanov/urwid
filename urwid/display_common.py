@@ -493,6 +493,7 @@ class AttrSpec(object):
         if colors not in (1, 16, 88, 256):
             raise AttrSpecError('invalid number of colors (%d).' % colors)
         self._value = 0 | _HIGH_88_COLOR * (colors == 88)
+        self._link = None
         self.foreground = fg
         self.background = bg
         if self.colors > colors:
@@ -513,6 +514,8 @@ class AttrSpec(object):
     blink = property(lambda s: s._value & _BLINK != 0)
     standout = property(lambda s: s._value & _STANDOUT != 0)
     strikethrough = property(lambda s: s._value & _STRIKETHROUGH != 0)
+    link = property(lambda s: s._link)
+    decoded_link = property(lambda s: s._link.replace(" ", ",") if s._link else None)
 
     def _colors(self):
         """
@@ -551,10 +554,14 @@ class AttrSpec(object):
         return _color_desc_256(self.foreground_number)
 
     def _foreground(self):
+        linkstr = ""
+        if self._link:
+            linkstr = ',url|' + self._link
         return (self._foreground_color() +
             ',bold' * self.bold + ',italics' * self.italics +
             ',standout' * self.standout + ',blink' * self.blink +
-            ',underline' * self.underline + ',strikethrough' * self.strikethrough)
+            ',underline' * self.underline + ',strikethrough' * self.strikethrough +
+            linkstr)
 
     def _set_foreground(self, foreground):
         color = None
@@ -570,7 +577,15 @@ class AttrSpec(object):
                         repr(foreground)))
                 flags |= _ATTRIBUTES[part]
                 continue
+
+            f = open("/tmp/dump", "a")
+            f.write(part)
+            if "url|" in part:
+                self._link = part.split("|", 1)[1]
+                f.write("saw a url bit thingy: " + self._link + "\n")
+                continue
             # past this point we must be specifying a color
+            scolor = 0
             if part in ('', 'default'):
                 scolor = 0
             elif part in _BASIC_COLORS:
@@ -584,6 +599,8 @@ class AttrSpec(object):
                 flags |= _FG_HIGH_COLOR
             # _parse_color_*() return None for unrecognised colors
             if scolor is None:
+                f.write("scolor")
+                f.write(repr(scolor))
                 raise AttrSpecError(("Unrecognised color specification %s " +
                     "in foreground (%s)") % (repr(part), repr(foreground)))
             if color is not None:
@@ -657,7 +674,7 @@ class AttrSpec(object):
             return vals + _COLOR_VALUES_256[self.background_number]
 
     def __eq__(self, other):
-        return isinstance(other, AttrSpec) and self._value == other._value
+        return isinstance(other, AttrSpec) and self._value == other._value and self._link == other._link
 
     def __ne__(self, other):
         return not self == other

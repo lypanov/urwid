@@ -959,8 +959,18 @@ class Screen(BaseScreen, RealTerminal):
                 bg = "%d" % (a.background_number + 40)
         else:
             bg = "49"
-        return escape.ESC + "[0;%s;%s%sm" % (fg, st, bg)
-
+        f = open("/tmp/out", "a")
+        f.write(repr(a))
+        if a.link:
+            f.write("OMG WHEE URL: " +  a.decoded_link)
+        es = "[0;%s;%s%sm" % (fg, st, bg)
+        f.write(fg + ":")
+        f.write(str(a) + ":")
+        f.write(es + "\n")
+        if a.link:
+            return escape.ESC + es + escape.ESC + "]8;;" + a.decoded_link + escape.ESC + "\\XXX" + escape.ESC + "]8;;" + escape.ESC + "\\"
+        else:
+            return escape.ESC + es
 
     def set_terminal_properties(self, colors=None, bright_is_bold=None,
         has_underline=None):
