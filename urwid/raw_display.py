@@ -959,14 +959,14 @@ class Screen(BaseScreen, RealTerminal):
                 bg = "%d" % (a.background_number + 40)
         else:
             bg = "49"
-        f = open("/tmp/out", "a")
-        f.write(repr(a))
-        if a.link:
-            f.write("OMG WHEE URL: " +  a.decoded_link)
+        # f = open("/tmp/out", "a")
+        # f.write(repr(a))
+        # if a.link:
+        #     f.write("OMG WHEE URL: " +  a.decoded_link)
         es = "[0;%s;%s%sm" % (fg, st, bg)
-        f.write(fg + ":")
-        f.write(str(a) + ":")
-        f.write(es + "\n")
+        # f.write(fg + ":")
+        # f.write(str(a) + ":")
+        # f.write(es + "\n")
         if a.link:
             return escape.ESC + es + escape.ESC + "]8;;" + a.decoded_link + escape.ESC + "\\XXX" + escape.ESC + "]8;;" + escape.ESC + "\\"
         else:

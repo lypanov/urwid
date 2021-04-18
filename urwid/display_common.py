@@ -578,11 +578,11 @@ class AttrSpec(object):
                 flags |= _ATTRIBUTES[part]
                 continue
 
-            f = open("/tmp/dump", "a")
-            f.write(part)
+            # f = open("/tmp/dump", "a")
+            # f.write(part)
             if "url|" in part:
                 self._link = part.split("|", 1)[1]
-                f.write("saw a url bit thingy: " + self._link + "\n")
+                # f.write("saw a url bit thingy: " + self._link + "\n")
                 continue
             # past this point we must be specifying a color
             scolor = 0
@@ -599,8 +599,8 @@ class AttrSpec(object):
                 flags |= _FG_HIGH_COLOR
             # _parse_color_*() return None for unrecognised colors
             if scolor is None:
-                f.write("scolor")
-                f.write(repr(scolor))
+                # f.write("scolor")
+                # f.write(repr(scolor))
                 raise AttrSpecError(("Unrecognised color specification %s " +
                     "in foreground (%s)") % (repr(part), repr(foreground)))
             if color is not None:
